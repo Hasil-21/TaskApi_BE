@@ -40,7 +40,7 @@ phases:
 
       - echo "Deploying to Lambda..."
       - aws lambda update-function-code
-          --function-name taskapi
+          --function-name demo-project-lambda
           --zip-file fileb://lambda.zip
           --region ap-south-1
 
