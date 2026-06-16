@@ -33,7 +33,7 @@ phases:
 
       - echo "Deploying to Lambda..."
       - aws lambda update-function-code
-          --function-name demo-project-lambda
+          --function-name demo-project-dev-demo-project-lambda-sls
           --zip-file fileb://lambda.zip
           --region ap-south-1
 
