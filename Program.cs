@@ -3,7 +3,7 @@ using TaskApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
+builder.Services.AddAWSLambdaHosting(LambdaEventSource.RestApi);
 builder.Services.AddControllers();
 
 var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING")
