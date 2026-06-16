@@ -30,11 +30,14 @@ phases:
       - echo "Copying to fixed S3 path..."
       - aws s3 cp lambda.zip s3://demo-project-artifact-hasil/latest/lambda.zip
 
-      - echo "Deploying to Lambda..."
-      - aws lambda update-function-code
-          --function-name demo-project-dev-demo-project-lambda-sls
-          --zip-file fileb://lambda.zip
-          --region ap-south-1
+      # - echo "Deploying to Lambda..."
+      # - aws lambda update-function-code
+      #     --function-name demo-project-dev-demo-project-lambda-sls
+      #     --zip-file fileb://lambda.zip
+      #     --region ap-south-1
+
+      - echo "Deploying Infrastructure..."
+      - npm run deploy
 
 artifacts:
   files:

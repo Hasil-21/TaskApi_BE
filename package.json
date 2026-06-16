@@ -1,0 +1,13 @@
+{
+  "name": "demo-project",
+  "version": "1.0.0",
+  "scripts": {
+    "prebuild": "serverless package --package .serverless",
+    "build": "aws s3 cp s3://demo-project-artifact-hasil/latest/lambda.zip ./.serverless/demo-project.zip",
+    "postbuild": "echo Build complete!",
+
+    "predeploy": "npm run build",
+    "deploy": "serverless deploy --package .serverless",
+    "postdeploy": "echo Deployment complete!"
+  }
+}

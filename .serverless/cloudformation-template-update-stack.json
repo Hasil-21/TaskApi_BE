@@ -176,7 +176,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/demo-project/dev/1781594209363-2026-06-16T07:16:49.363Z/demo-project.zip"
+          "S3Key": "serverless/demo-project/dev/1781602648808-2026-06-16T09:37:28.808Z/demo-project.zip"
         },
         "Handler": "TaskApi",
         "Runtime": "dotnet8",
@@ -207,16 +207,6 @@
       "DependsOn": [
         "DemoDashprojectDashlambdaDashslsLogGroup"
       ]
-    },
-    "DemoDashprojectDashlambdaDashslsLambdaVersionY08qhF0PdVgIai29msSDr8UfxP9uGukCgm2fd8": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "DemoDashprojectDashlambdaDashslsLambdaFunction"
-        },
-        "CodeSha256": "0jSrlKAnmfEmp/jtstDSXHGki/B5Zooz9Mrxden7+aI="
-      }
     },
     "ApiGatewayRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
@@ -433,7 +423,7 @@
         "DemoDashprojectDashlambdaDashslsLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1781594206041": {
+    "ApiGatewayDeployment1781602645435": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -493,15 +483,6 @@
       },
       "Export": {
         "Name": "sls-demo-project-dev-ServerlessDeploymentBucketName"
-      }
-    },
-    "DemoDashprojectDashlambdaDashslsLambdaFunctionQualifiedArn": {
-      "Description": "Current Lambda function version",
-      "Value": {
-        "Ref": "DemoDashprojectDashlambdaDashslsLambdaVersionY08qhF0PdVgIai29msSDr8UfxP9uGukCgm2fd8"
-      },
-      "Export": {
-        "Name": "sls-demo-project-dev-DemoDashprojectDashlambdaDashslsLambdaFunctionQualifiedArn"
       }
     },
     "ServiceEndpoint": {

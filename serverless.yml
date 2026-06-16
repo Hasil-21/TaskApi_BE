@@ -4,6 +4,7 @@ provider:
   name: aws
   runtime: dotnet8
   region: ap-south-1
+  versionFunctions: false
 
 functions:
   demo-project-lambda-sls:
@@ -37,7 +38,6 @@ functions:
               - ssm:*
               - kms:Decrypt    
             Resource: "*"
-    package: 
-      artifact: s3://demo-project-artifact-hasil/latest/lambda.zip
+
 
 
