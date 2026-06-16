@@ -1,0 +1,29 @@
+version: 0.2
+
+env:
+  variables:
+    CONNECTION_STRING: ""
+
+phases:
+  install:
+    runtime-versions:
+      dotnet: 8.0
+    commands:
+      - echo "Installing dotnet-ef..."
+      - dotnet tool install --global dotnet-ef --version 8.0.0
+      - export PATH="$PATH:/root/.dotnet/tools"
+
+  pre_build:
+    commands:
+      - echo "Restoring packages..."
+      - dotnet restore TaskApi.csproj
+
+  build:
+    commands:
+      - echo "Building..."
+      - dotnet build TaskApi.csproj --configuration Release --no-restore
+
+  post_build:
+    commands:
+      - echo "Running migrations..."
+      - dotnet ef database update --connection "$CONNECTION_STRING"

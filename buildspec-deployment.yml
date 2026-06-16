@@ -8,10 +8,6 @@ phases:
   install:
     runtime-versions:
       dotnet: 8.0
-    commands:
-      - echo "Installing dotnet-ef..."
-      - dotnet tool install --global dotnet-ef --version 8.0.0
-      - export PATH="$PATH:/root/.dotnet/tools"
 
   pre_build:
     commands:
@@ -25,9 +21,6 @@ phases:
 
   post_build:
     commands:
-      - echo "Running migrations..."
-      - dotnet ef database update --connection "$CONNECTION_STRING"
-
       - echo "Publishing..."
       - dotnet publish TaskApi.csproj
           --configuration Release
