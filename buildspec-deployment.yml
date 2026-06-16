@@ -1,9 +1,5 @@
 version: 0.2
 
-env:
-  variables:
-    CONNECTION_STRING: ""
-
 phases:
   install:
     runtime-versions:
