@@ -27,7 +27,7 @@ functions:
         - subnet-0d1cbb6674856b351
         - subnet-0ba92b13c578ff7dc
     environment:
-      CONNECTION_STRING: ${ssm:/aws/reference/secretsmanager/demo-project/connection-string}
+      CONNECTION_STRING: ${ssm:/aws/reference/secretsmanager/demo-project/connection-string}  
     iam:
       role:
         statements:

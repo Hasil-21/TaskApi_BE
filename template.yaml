@@ -15,6 +15,7 @@ Resources:
                 - codebuild.amazonaws.com
             Action:
               - sts:AssumeRole
+
       Policies:
         - PolicyDocument:
             Version: '2012-10-17'
@@ -25,6 +26,13 @@ Resources:
                   - lambda:*
                   - logs:*
                   - ec2:*
+                  - codeconnections:*
+                  - ssm:*
+                  - kms:*
+                  - secretsmanager:*
+                  - cloudformation:*
+                  - iam:*
+                  - apigateway:*
                 Resource: "*"
           PolicyName: CodeBuildDeployPolicy
 
@@ -71,6 +79,10 @@ Resources:
                   - logs:*
                   - ec2:*
                   - rds:*
+                  - codeconnections:*
+                  - ssm:*
+                  - kms:*
+                  - secretsmanager:*
                 Resource: "*"
           PolicyName: CodeBuildMigrationPolicy
 
@@ -84,6 +96,10 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/amazonlinux-x86_64-standard:6.0
         Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: CONNECTION_STRING
+            Value: demo-project/connection-string
+            Type: SECRETS_MANAGER
       ServiceRole: !GetAtt CodeBuildMigrationRole.Arn
       Source:
         Type: GITHUB

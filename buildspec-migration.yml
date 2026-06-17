@@ -26,4 +26,5 @@ phases:
   post_build:
     commands:
       - echo "Running migrations..."
+      - echo "$CONNECTION_STRING"
       - dotnet ef database update --connection "$CONNECTION_STRING"
