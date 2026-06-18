@@ -43,6 +43,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "AWSSDK.SQS": {
+              "target": "Package",
+              "version": "[4.0.3.6, )"
+            },
             "Amazon.Lambda.AspNetCoreServer": {
               "target": "Package",
               "version": "[10.1.1, )"

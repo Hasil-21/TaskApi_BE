@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskApi.Data;
 using TaskApi.Models;
+using Amazon.SQS;
+using Amazon.SQS.Model;
+using System.Text.Json;
 
 namespace TaskApi.Controllers;
 
@@ -10,13 +13,24 @@ namespace TaskApi.Controllers;
 public class TasksController : ControllerBase
 {
     private readonly AppDbContext _db;
-    public TasksController(AppDbContext db) => _db = db;
+    private readonly IAmazonSQS _sqs;
+    public TasksController(AppDbContext db,IAmazonSQS sqs)
+    {
+        _db=db;
+        _sqs=sqs;
+    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
         var task = await _db.Tasks.FindAsync(id);
-        return task is null ? NotFound() : Ok(task);
+        return task is null ? NotFound() : Ok(
+            await _sqs.SendMessageAsync(new SendMessageRequest
+            {
+                QueueUrl = "https://sqs.ap-south-1.amazonaws.com/292578125952/demo-queue",
+                MessageBody = JsonSerializer.Serialize(task)
+            })
+        );
     }
 
     [HttpPost]

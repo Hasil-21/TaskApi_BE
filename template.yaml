@@ -286,7 +286,7 @@ Resources:
           - !Ref PrivateSubnet1
           - !Ref PrivateSubnet2
         SecurityGroupIds:
-          - !GetAtt RDSSecurityGroup.GroupId
+          - !GetAtt LambdaSecurityGroup.GroupId
 
   #Pipeline
 
@@ -347,12 +347,12 @@ Resources:
                 Owner: AWS
                 Provider: CodeBuild
                 Version: '1'
-              Name: DB
+              Name: API
               Configuration:
-                ProjectName: demo-project-migration
+                ProjectName: demo-project-deploy
               InputArtifacts:
                 - Name: SourceOutput
-          Name: DatabaseMigration   
+          Name: LambdaDeploy
 
         - Actions:
             - ActionTypeId:
@@ -360,12 +360,12 @@ Resources:
                 Owner: AWS
                 Provider: CodeBuild
                 Version: '1'
-              Name: API
+              Name: DB
               Configuration:
-                ProjectName: demo-project-deploy
+                ProjectName: demo-project-migration
               InputArtifacts:
                 - Name: SourceOutput
-          Name: LambdaDeploy
+          Name: DatabaseMigration
   
 Outputs:
   SlsLambdaSecurityGroup:
