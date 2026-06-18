@@ -22,10 +22,10 @@ functions:
           cors: true
     vpc: 
       securityGroupIds:
-        - ${cf:dummy-project-cf.SlsLambdaSecurityGroup}
+        - ${cf:demo-project-cf.SlsLambdaSecurityGroup}
       subnetIds:
-        - ${cf:dummy-project-cf.SlsPrivateSubnet1}
-        - ${cf:dummy-project-cf.SlsPrivateSubnet2}
+        - ${cf:demo-project-cf.SlsPrivateSubnet1}
+        - ${cf:demo-project-cf.SlsPrivateSubnet2}
     environment:
       CONNECTION_STRING: ${ssm:/aws/reference/secretsmanager/dummy-project/connection-string}  
     iam:
