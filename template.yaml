@@ -213,6 +213,7 @@ Resources:
                   - cloudformation:*
                   - iam:*
                   - apigateway:*
+                  - sqs:*
                 Resource: "*"
           PolicyName: CodeBuildDeployPolicy
 

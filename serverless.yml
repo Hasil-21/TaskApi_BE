@@ -37,7 +37,8 @@ functions:
               - logs:*
               - ec2:*
               - ssm:*
-              - kms:Decrypt    
+              - kms:Decrypt
+              - sqs:*    
             Resource: "*"
     destinations:
       onSuccess: arn:aws:sqs:ap-south-1:292578125952:demo-queue2
