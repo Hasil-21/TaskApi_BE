@@ -2,7 +2,180 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: CloudFormation template to deploy CodeBuild
 
 Resources:
+
+  #VPC
+
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+
+  #Subnet
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: ap-south-1a
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: ap-south-1b
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: ap-south-1a
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.4.0/24
+      AvailabilityZone: ap-south-1b
+
+  #Internet Gateway
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  #Nat Gateway
+
+  NatEip:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachInternetGateway
+    Properties:
+      Domain: vpc
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatEip.AllocationId
+      SubnetId: !Ref PublicSubnet1
+
+  #Route Table
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachInternetGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref NatGateway
+
+  PublicSubnet1RouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+
+  PublicSubnet2RouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet2
+
+  PrivateSubnet1RouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet1
+
+  PrivateSubnet2RouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet2
+
+  #Security Group
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: This is a SG for Lambda created by CF
+      VpcId: !Ref MyVPC
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: This is a SG For RDS created by CF
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref LambdaSecurityGroup
+
+  #Database
+
+  MyDummyDatabaseSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: This is a subnet group created using CloudFormation
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      
+  MyPostgresDatabase:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: dummy-database
+      Engine: postgres
+      EngineVersion: '18.3'
+      DBInstanceClass: db.t3.micro
+      AllocatedStorage: "20"
+      StorageType: gp3
+      MasterUsername: dummy_admin
+      MasterUserPassword: Dummy#1234
+      PubliclyAccessible: false
+      VPCSecurityGroups:
+        - !GetAtt RDSSecurityGroup.GroupId
+      DBSubnetGroupName: !Ref MyDummyDatabaseSubnetGroup
+      BackupRetentionPeriod: 0
+      MultiAZ: false
+      DeletionProtection: false
+
+  #Connection String Store in Secret Manager
+
+  DatabaseConnectionSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: dummy-project/connection-string
+      SecretString: !Sub
+        - Host=${Endpoint};Port=5432;Database=postgres;Username=dummy_admin;Password=Dummy#1234
+        - Endpoint: !GetAtt MyPostgresDatabase.Endpoint.Address
+
   #Deployment
+
   CodeBuildDeployRole:
     Type: AWS::IAM::Role
     Properties:
@@ -55,6 +228,7 @@ Resources:
       
 
   #Migration
+
   CodeBuildMigrationRole:
     Type: AWS::IAM::Role
     Properties:
@@ -107,12 +281,14 @@ Resources:
         GitCloneDepth: 1
         BuildSpec: buildspec-migration.yml
       VpcConfig:
-        VpcId: vpc-0cdb9341e56401645
+        VpcId: !Ref MyVPC
         Subnets:
-          - subnet-0ba92b13c578ff7dc
-          - subnet-0d1cbb6674856b351
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
         SecurityGroupIds:
-          - sg-0fae0b4067744f26a
+          - !GetAtt RDSSecurityGroup.GroupId
+
+  #Pipeline
 
   CodePipelineRole:
     Type: AWS::IAM::Role
@@ -134,13 +310,21 @@ Resources:
               - Effect: Allow
                 Action:
                   - s3:*
+                  - codeconnections:*
+                  - codebuild:*
                 Resource: "*"
           PolicyName: CodePipelinePolicy
+
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
 
   CodePipelineProject:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       RoleArn: !GetAtt CodePipelineRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactBucket
       Stages:
         - Actions:
             - ActionTypeId:
@@ -151,8 +335,10 @@ Resources:
               Name: GitHub
               Configuration:
                 ConnectionArn: arn:aws:codeconnections:ap-south-1:292578125952:connection/b317277a-0fbe-4331-827e-f33e3917a3ff
-                FullRepositoryId: https://github.com/Hasil-21/Dummy-Files-Hasil.git
+                FullRepositoryId: Hasil-21/Dummy-Files-Hasil
                 BranchName: main
+              OutputArtifacts:
+                - Name: SourceOutput
           Name: Source 
 
         - Actions:
@@ -180,3 +366,13 @@ Resources:
               InputArtifacts:
                 - Name: SourceOutput
           Name: LambdaDeploy
+  
+Outputs:
+  SlsLambdaSecurityGroup:
+    Value: !Ref LambdaSecurityGroup
+  
+  SlsPrivateSubnet1:
+    Value: !Ref PrivateSubnet1
+
+  SlsPrivateSubnet2:
+    Value: !Ref PrivateSubnet2

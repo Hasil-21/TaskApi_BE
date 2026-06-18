@@ -188,7 +188,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/demo-project/dev/1781674466755-2026-06-17T05:34:26.755Z/demo-project.zip"
+                "S3Key": "serverless/demo-project/dev/1781697165010-2026-06-17T11:52:45.010Z/demo-project.zip"
               },
               "Handler": "TaskApi",
               "Runtime": "dotnet8",
@@ -435,7 +435,7 @@
               "DemoDashprojectDashlambdaDashslsLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1781674461095": {
+          "ApiGatewayDeployment1781697160229": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -714,7 +714,7 @@
     "artifact": "C:\\Users\\pca56\\Desktop\\TaskApi\\TaskApi\\.serverless\\demo-project.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/demo-project/dev/1781674466755-2026-06-17T05:34:26.755Z",
+    "artifactDirectoryName": "serverless/demo-project/dev/1781697165010-2026-06-17T11:52:45.010Z",
     "artifact": "demo-project.zip"
   }
 }
