@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  PrivateSubnet1: 
+    Type: String
+
+  PrivateSubnet2: 
+    Type: String
+  
+  DBInstanceIdentifier:
+    Type: String
+
+  RDSSecurityGroupId:
+    Type: String
+
+  MasterUsername:
+    Type: String
+  
+  MasterUserPassword:
+    Type: String
+
+Resources:
+  RDSSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: This is a subnet group created using CloudFormation
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+    
+  RDSDatabase:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Ref DBInstanceIdentifier
+      Engine: postgres
+      EngineVersion: '18.3'
+      DBInstanceClass: db.t3.micro
+      AllocatedStorage: "20"
+      StorageType: gp3
+      MasterUsername: !Ref MasterUsername
+      MasterUserPassword: !Ref MasterUserPassword
+      PubliclyAccessible: false
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroupId
+      DBSubnetGroupName: !Ref RDSSubnetGroup 
+      BackupRetentionPeriod: 0
+      MultiAZ: false
+      DeletionProtection: false
+
+Outputs:
+  RDSEndpoint:
+    Value: !GetAtt RDSDatabase.Endpoint.Address

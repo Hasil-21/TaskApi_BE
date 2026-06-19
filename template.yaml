@@ -13,156 +13,110 @@ Resources:
   #Subnet
 
   PublicSubnet1:
-    Type: AWS::EC2::Subnet
+    Type: AWS::CloudFormation::Stack
     Properties:
-      VpcId: !Ref MyVPC
-      CidrBlock: 10.0.1.0/24
-      AvailabilityZone: ap-south-1a
+      TemplateURL: Network/subnet.yml
+      Parameters:
+        VpcId: !Ref MyVPC
+        CidrBlock: 10.0.1.0/24
+        AvailabilityZone: ap-south-1a
 
   PublicSubnet2:
-    Type: AWS::EC2::Subnet
+    Type: AWS::CloudFormation::Stack
     Properties:
-      VpcId: !Ref MyVPC
-      CidrBlock: 10.0.2.0/24
-      AvailabilityZone: ap-south-1b
+      TemplateURL: Network/subnet.yml
+      Parameters:       
+        VpcId: !Ref MyVPC
+        CidrBlock: 10.0.2.0/24
+        AvailabilityZone: ap-south-1b
 
   PrivateSubnet1:
-    Type: AWS::EC2::Subnet
+    Type: AWS::CloudFormation::Stack
     Properties:
-      VpcId: !Ref MyVPC
-      CidrBlock: 10.0.3.0/24
-      AvailabilityZone: ap-south-1a
+      TemplateURL: Network/subnet.yml
+      Parameters:    
+        VpcId: !Ref MyVPC
+        CidrBlock: 10.0.3.0/24
+        AvailabilityZone: ap-south-1a
 
   PrivateSubnet2:
-    Type: AWS::EC2::Subnet
+    Type: AWS::CloudFormation::Stack
     Properties:
-      VpcId: !Ref MyVPC
-      CidrBlock: 10.0.4.0/24
-      AvailabilityZone: ap-south-1b
+      TemplateURL: Network/subnet.yml
+      Parameters:
+        VpcId: !Ref MyVPC
+        CidrBlock: 10.0.4.0/24
+        AvailabilityZone: ap-south-1b
 
   #Internet Gateway
 
-  InternetGateway:
-    Type: AWS::EC2::InternetGateway
-
-  AttachInternetGateway:
-    Type: AWS::EC2::VPCGatewayAttachment
+  InternetGatewayStack:
+    Type: AWS::CloudFormation::Stack
     Properties:
-      VpcId: !Ref MyVPC
-      InternetGatewayId: !Ref InternetGateway
+      TemplateURL: Network/internet-gateway.yml
+      Parameters:
+        VpcId: !Ref MyVPC
 
   #Nat Gateway
 
-  NatEip:
-    Type: AWS::EC2::EIP
-    DependsOn: AttachInternetGateway
+  NatGatewayStack:
+    Type: AWS::CloudFormation::Stack
     Properties:
-      Domain: vpc
-
-  NatGateway:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt NatEip.AllocationId
-      SubnetId: !Ref PublicSubnet1
+      TemplateURL: Network/nat-gateway.yml
+      Parameters:
+        SubnetId: !GetAtt PublicSubnet1.Outputs.SubnetId
 
   #Route Table
 
-  PublicRouteTable:
-    Type: AWS::EC2::RouteTable
+  RoutingStack:
+    Type: AWS::CloudFormation::Stack
     Properties:
-      VpcId: !Ref MyVPC
-
-  PrivateRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref MyVPC
-
-  PublicRoute:
-    Type: AWS::EC2::Route
-    DependsOn: AttachInternetGateway
-    Properties:
-      RouteTableId: !Ref PublicRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGateway
-
-  PrivateRoute:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref NatGateway
-
-  PublicSubnet1RouteAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref PublicSubnet1
-
-  PublicSubnet2RouteAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref PublicSubnet2
-
-  PrivateSubnet1RouteAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      SubnetId: !Ref PrivateSubnet1
-
-  PrivateSubnet2RouteAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRouteTable
-      SubnetId: !Ref PrivateSubnet2
+      TemplateURL: Network/routing.yml
+      Parameters:
+        VpcId: !Ref MyVPC
+        InternetGateway: !GetAtt InternetGatewayStack.Outputs.InternetGatewayId
+        NatGateway: !GetAtt NatGatewayStack.Outputs.NatGatewayId
+        PublicSubnet1: !GetAtt PublicSubnet1.Outputs.SubnetId
+        PublicSubnet2: !GetAtt PublicSubnet2.Outputs.SubnetId
+        PrivateSubnet1: !GetAtt PrivateSubnet1.Outputs.SubnetId
+        PrivateSubnet2: !GetAtt PrivateSubnet2.Outputs.SubnetId
 
   #Security Group
 
   LambdaSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: AWS::CloudFormation::Stack
     Properties:
-      GroupDescription: This is a SG for Lambda created by CF
-      VpcId: !Ref MyVPC
+      TemplateURL: Network/security-group.yml
+      Parameters:
+        GroupDescription: This is a SG for Lambda created by CF
+        VpcId: !Ref MyVPC
 
   RDSSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: AWS::CloudFormation::Stack
+    DependsOn: LambdaSecurityGroup
     Properties:
-      GroupDescription: This is a SG For RDS created by CF
-      VpcId: !Ref MyVPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 5432
-          ToPort: 5432
-          SourceSecurityGroupId: !Ref LambdaSecurityGroup
+      TemplateURL: Network/security-group.yml
+      Parameters:
+        GroupDescription: This is a SG For RDS created by CF
+        VpcId: !Ref MyVPC
+        IpProtocol: tcp
+        FromPort: 5432
+        ToPort: 5432
+        SourceSecurityGroupId: !GetAtt LambdaSecurityGroup.Outputs.SecurityGroupId
 
   #Database
 
-  MyDummyDatabaseSubnetGroup:
-    Type: AWS::RDS::DBSubnetGroup
+  RDSStack:
+    Type: AWS::CloudFormation::Stack
     Properties:
-      DBSubnetGroupDescription: This is a subnet group created using CloudFormation
-      SubnetIds:
-        - !Ref PrivateSubnet1
-        - !Ref PrivateSubnet2 
-      
-  MyPostgresDatabase:
-    Type: AWS::RDS::DBInstance
-    Properties:
-      DBInstanceIdentifier: dummy-database
-      Engine: postgres
-      EngineVersion: '18.3'
-      DBInstanceClass: db.t3.micro
-      AllocatedStorage: "20"
-      StorageType: gp3
-      MasterUsername: dummy_admin
-      MasterUserPassword: Dummy#1234
-      PubliclyAccessible: false
-      VPCSecurityGroups:
-        - !GetAtt RDSSecurityGroup.GroupId
-      DBSubnetGroupName: !Ref MyDummyDatabaseSubnetGroup
-      BackupRetentionPeriod: 0
-      MultiAZ: false
-      DeletionProtection: false
+      TemplateURL: Database/rds.yml
+      Parameters:
+        DBInstanceIdentifier: dummy-database
+        PrivateSubnet1: !GetAtt PrivateSubnet1.Outputs.SubnetId
+        PrivateSubnet2: !GetAtt PrivateSubnet2.Outputs.SubnetId
+        MasterUsername: dummy_admin
+        MasterUserPassword: Dummy#1234
+        RDSSecurityGroupId: !GetAtt RDSSecurityGroup.Outputs.SecurityGroupId
 
   #Connection String Store in Secret Manager
 
@@ -172,7 +126,7 @@ Resources:
       Name: dummy-project/connection-string
       SecretString: !Sub
         - Host=${Endpoint};Port=5432;Database=postgres;Username=dummy_admin;Password=Dummy#1234
-        - Endpoint: !GetAtt MyPostgresDatabase.Endpoint.Address
+        - Endpoint: !GetAtt RDSStack.Outputs.RDSEndpoint
 
   #SQS
 
@@ -291,10 +245,10 @@ Resources:
       VpcConfig:
         VpcId: !Ref MyVPC
         Subnets:
-          - !Ref PrivateSubnet1
-          - !Ref PrivateSubnet2
+          - !GetAtt PrivateSubnet1.Outputs.SubnetId
+          - !GetAtt PrivateSubnet2.Outputs.SubnetId
         SecurityGroupIds:
-          - !GetAtt LambdaSecurityGroup.GroupId
+          - !GetAtt LambdaSecurityGroup.Outputs.SecurityGroupId
 
   #Pipeline
 
@@ -377,19 +331,21 @@ Resources:
   
 Outputs:
   SlsLambdaSecurityGroup:
-    Value: !Ref LambdaSecurityGroup
+    Value: !GetAtt LambdaSecurityGroup.Outputs.SecurityGroupId
   
   SlsPrivateSubnet1:
-    Value: !Ref PrivateSubnet1
+    Value: !GetAtt PrivateSubnet1.Outputs.SubnetId
 
   SlsPrivateSubnet2:
-    Value: !Ref PrivateSubnet2
+    Value: !GetAtt PrivateSubnet2.Outputs.SubnetId
 
   SlsSQSQueueArn:
     Value: !GetAtt DemoSQSQueue.Arn
 
   SQSUrl:
     Value: !Ref DemoSQSQueue
+
+    
 
 
 
