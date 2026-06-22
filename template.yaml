@@ -274,6 +274,8 @@ Resources:
           - Name: CONNECTION_STRING
             Value: dummy-project/connection-string
             Type: SECRETS_MANAGER
+          - Name: RUN_MIGRATIONS
+            Value: "false" 
       ServiceRole: !GetAtt CodeBuildMigrationRole.Arn
       Source:
         Type: GITHUB

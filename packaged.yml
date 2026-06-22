@@ -157,6 +157,13 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: demo-queue2
+  SNSEmailTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: demo-project-email-topic
+      Subscription:
+      - Endpoint: hasiltr@gmail.com
+        Protocol: email
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
@@ -276,6 +283,8 @@ Resources:
         - Name: CONNECTION_STRING
           Value: dummy-project/connection-string
           Type: SECRETS_MANAGER
+        - Name: RUN_MIGRATIONS
+          Value: 'false'
       ServiceRole:
         Fn::GetAtt:
         - CodeBuildMigrationRole
@@ -404,3 +413,6 @@ Outputs:
       Fn::GetAtt:
       - CognitoUserPool
       - Arn
+  SnsTopicEmailArn:
+    Value:
+      Ref: SNSEmailTopic
