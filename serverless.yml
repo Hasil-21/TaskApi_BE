@@ -26,10 +26,18 @@ functions:
           path: /{proxy+}
           method: ANY
           cors: true
+          authorizer:
+            name: cognito-authorizer
+            type: COGNITO_USER_POOLS
+            arn: ${cf:demo-project-cf.CognitoUserPoolArn}
       - http:
           path: /
           method: ANY
           cors: true
+          authorizer:
+            name: cognito-authorizer
+            type: COGNITO_USER_POOLS
+            arn: ${cf:demo-project-cf.CognitoUserPoolArn}
     vpc: 
       securityGroupIds:
         - ${cf:demo-project-cf.SlsLambdaSecurityGroup}

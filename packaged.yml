@@ -157,6 +157,31 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: demo-queue2
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: taskapi-userpool
+      UsernameAttributes:
+      - email
+      AutoVerifiedAttributes:
+      - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: taskapi-client
+      UserPoolId:
+        Ref: CognitoUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+      - ALLOW_USER_PASSWORD_AUTH
+      - ALLOW_REFRESH_TOKEN_AUTH
   CodeBuildDeployRole:
     Type: AWS::IAM::Role
     Properties:
@@ -374,3 +399,8 @@ Outputs:
   SQSUrl:
     Value:
       Ref: DemoSQSQueue
+  CognitoUserPoolArn:
+    Value:
+      Fn::GetAtt:
+      - CognitoUserPool
+      - Arn
