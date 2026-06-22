@@ -345,7 +345,5 @@ Outputs:
   SQSUrl:
     Value: !Ref DemoSQSQueue
 
-    
-
 
 

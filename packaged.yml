@@ -353,7 +353,9 @@ Resources:
 Outputs:
   SlsLambdaSecurityGroup:
     Value:
-      Ref: LambdaSecurityGroup
+      Fn::GetAtt:
+      - LambdaSecurityGroup
+      - Outputs.SecurityGroupId
   SlsPrivateSubnet1:
     Value:
       Fn::GetAtt:

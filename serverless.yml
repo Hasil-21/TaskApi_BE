@@ -6,6 +6,16 @@ provider:
   region: ap-south-1
   versionFunctions: false
 
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - logs:*
+        - ec2:*
+        - ssm:*
+        - kms:Decrypt
+        - sqs:*
+      Resource: "*"
+
 functions:
   demo-project-lambda-sls:
     handler: TaskApi 
@@ -29,17 +39,6 @@ functions:
     environment:
       CONNECTION_STRING: ${ssm:/aws/reference/secretsmanager/dummy-project/connection-string}
       SQS_URL: ${cf:demo-project-cf.SQSUrl}  
-    iam:
-      role:
-        statements:
-          - Effect: Allow
-            Action:
-              - logs:*
-              - ec2:*
-              - ssm:*
-              - kms:Decrypt
-              - sqs:*    
-            Resource: "*"
     destinations:
       onSuccess: ${cf:demo-project-cf.SlsSQSQueueArn}
 
