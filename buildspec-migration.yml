@@ -29,7 +29,7 @@ phases:
       - |
         if [ "$RUN_MIGRATIONS" = "true" ]; then
           echo "Running migrations..."
-          dotnet ef database update --connection "$CONNECTION_STRING""
+          dotnet ef database update --connection "$CONNECTION_STRING"
         else
           echo "Skipping migrations..."
         fi
