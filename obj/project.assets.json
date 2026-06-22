@@ -135,7 +135,20 @@
           }
         }
       },
-      "AWSSDK.Core/4.0.9.4": {
+      "Amazon.Lambda.SQSEvents/3.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Amazon.Lambda.SQSEvents.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Amazon.Lambda.SQSEvents.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "AWSSDK.Core/4.0.9.6": {
         "type": "package",
         "compile": {
           "lib/net8.0/AWSSDK.Core.dll": {
@@ -168,6 +181,22 @@
         },
         "build": {
           "buildTransitive/net8.0/AWSSDK.Extensions.NETCore.Setup.targets": {}
+        }
+      },
+      "AWSSDK.SimpleNotificationService/4.0.3.7": {
+        "type": "package",
+        "dependencies": {
+          "AWSSDK.Core": "[4.0.9.6, 5.0.0)"
+        },
+        "compile": {
+          "lib/net8.0/AWSSDK.SimpleNotificationService.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/AWSSDK.SimpleNotificationService.dll": {
+            "related": ".xml"
+          }
         }
       },
       "AWSSDK.SQS/4.0.3.6": {
@@ -1300,15 +1329,30 @@
         "lib/net8.0/Amazon.Lambda.Serialization.SystemTextJson.xml"
       ]
     },
-    "AWSSDK.Core/4.0.9.4": {
-      "sha512": "bpxzv4e0WjOVmKiYkjkNWeKvwyzoIVFS+u5zYnsryM2qTyhkfeLGQ4LPqDo+m/7OIJlGWr6V9zkc3V9bb0QmYg==",
+    "Amazon.Lambda.SQSEvents/3.0.0": {
+      "sha512": "FTWf7ODv7+hwnqHREYQWntNDJsu4WWtTcEZoji0e5QiChMMrMyfYf07E7flBanolf8dTY6jfVdDfC816uGkzdA==",
       "type": "package",
-      "path": "awssdk.core/4.0.9.4",
+      "path": "amazon.lambda.sqsevents/3.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "amazon.lambda.sqsevents.3.0.0.nupkg.sha512",
+        "amazon.lambda.sqsevents.nuspec",
+        "lib/net10.0/Amazon.Lambda.SQSEvents.dll",
+        "lib/net10.0/Amazon.Lambda.SQSEvents.xml",
+        "lib/net8.0/Amazon.Lambda.SQSEvents.dll",
+        "lib/net8.0/Amazon.Lambda.SQSEvents.xml"
+      ]
+    },
+    "AWSSDK.Core/4.0.9.6": {
+      "sha512": "Lzi5hMHNB+ApeMbQxNDCUNa+Lta00ozr1okKUGqUyNXUC/OG136k8M6jXgNrbwsRxDmVdHHY6UdD4aoUaGVzkQ==",
+      "type": "package",
+      "path": "awssdk.core/4.0.9.6",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "awssdk.core.4.0.9.4.nupkg.sha512",
+        "awssdk.core.4.0.9.6.nupkg.sha512",
         "awssdk.core.nuspec",
         "images/AWSLogo.png",
         "lib/net472/AWSSDK.Core.dll",
@@ -1342,6 +1386,31 @@
         "lib/netcoreapp3.1/AWSSDK.Extensions.NETCore.Setup.xml",
         "lib/netstandard2.0/AWSSDK.Extensions.NETCore.Setup.dll",
         "lib/netstandard2.0/AWSSDK.Extensions.NETCore.Setup.xml"
+      ]
+    },
+    "AWSSDK.SimpleNotificationService/4.0.3.7": {
+      "sha512": "ZNz5s2XsmPAdMHo8LgH57Hra3sFlPNs6ATC+vgp2KPB4fIG48pt3KJqxHPRvxW7dOqLUvQVvEFdU/czaxhoINQ==",
+      "type": "package",
+      "path": "awssdk.simplenotificationservice/4.0.3.7",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "analyzers/dotnet/cs/AWSSDK.SimpleNotificationService.CodeAnalysis.dll",
+        "analyzers/dotnet/cs/SharedAnalysisCode.dll",
+        "awssdk.simplenotificationservice.4.0.3.7.nupkg.sha512",
+        "awssdk.simplenotificationservice.nuspec",
+        "images/AWSLogo.png",
+        "lib/net472/AWSSDK.SimpleNotificationService.dll",
+        "lib/net472/AWSSDK.SimpleNotificationService.xml",
+        "lib/net8.0/AWSSDK.SimpleNotificationService.dll",
+        "lib/net8.0/AWSSDK.SimpleNotificationService.xml",
+        "lib/netcoreapp3.1/AWSSDK.SimpleNotificationService.dll",
+        "lib/netcoreapp3.1/AWSSDK.SimpleNotificationService.xml",
+        "lib/netstandard2.0/AWSSDK.SimpleNotificationService.dll",
+        "lib/netstandard2.0/AWSSDK.SimpleNotificationService.xml",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
       ]
     },
     "AWSSDK.SQS/4.0.3.6": {
@@ -3115,8 +3184,10 @@
     "net8.0": [
       "AWSSDK.Extensions.NETCore.Setup >= 4.0.4.9",
       "AWSSDK.SQS >= 4.0.3.6",
+      "AWSSDK.SimpleNotificationService >= 4.0.3.7",
       "Amazon.Lambda.AspNetCoreServer >= 10.1.1",
       "Amazon.Lambda.AspNetCoreServer.Hosting >= 2.0.0",
+      "Amazon.Lambda.SQSEvents >= 3.0.0",
       "Microsoft.AspNetCore.OpenApi >= 8.0.7",
       "Microsoft.EntityFrameworkCore >= 8.0.0",
       "Microsoft.EntityFrameworkCore.Design >= 8.0.0",
@@ -3174,6 +3245,10 @@
             "target": "Package",
             "version": "[4.0.3.6, )"
           },
+          "AWSSDK.SimpleNotificationService": {
+            "target": "Package",
+            "version": "[4.0.3.7, )"
+          },
           "Amazon.Lambda.AspNetCoreServer": {
             "target": "Package",
             "version": "[10.1.1, )"
@@ -3181,6 +3256,10 @@
           "Amazon.Lambda.AspNetCoreServer.Hosting": {
             "target": "Package",
             "version": "[2.0.0, )"
+          },
+          "Amazon.Lambda.SQSEvents": {
+            "target": "Package",
+            "version": "[3.0.0, )"
           },
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",

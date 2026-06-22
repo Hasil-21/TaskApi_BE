@@ -14,6 +14,7 @@ provider:
         - ssm:*
         - kms:Decrypt
         - sqs:*
+        - sns:*
       Resource: "*"
 
 functions:
@@ -49,6 +50,18 @@ functions:
       SQS_URL: ${cf:demo-project-cf.SQSUrl}  
     destinations:
       onSuccess: ${cf:demo-project-cf.SlsSQSQueueArn}
+
+  demo-project-process-sqs:
+    handler: TaskApi::SqsProcessor.Function::FunctionHandler
+    memorySize: 256
+    timeout: 30
+    environment:
+      SNS_TOPIC_ARN: ${cf:demo-project-cf.SnsTopicEmailArn}
+    events: 
+      - sqs:
+          arn: ${cf:demo-project-cf.SlsSQSQueueArn}
+          batchSize: 1
+          functionResponseType: ReportBatchItemFailures
 
 
 
