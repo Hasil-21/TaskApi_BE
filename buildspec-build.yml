@@ -14,6 +14,6 @@ artifacts:
   files:
     - TaskApi/bin/Release/net8.0/TaskApi.zip
     - serverless.yml
-    - buildspec-migrate.yml
+    - buildspec-migration.yml
     - buildspec-deploy.yml
   discard-paths: no
