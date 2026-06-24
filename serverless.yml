@@ -16,7 +16,7 @@ provider:
 
   environment:
     ASPNETCORE_ENVIRONMENT: Production
-    CONNECTION_STRING: '{{resolve:ssm:demo-project/dev/connection-string}}'
+    CONNECTION_STRING: '{{resolve:ssm:/demo-project/dev/connection-string}}'
     
   iam:
     role:
