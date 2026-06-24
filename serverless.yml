@@ -28,6 +28,9 @@ provider:
             - secretsmanager:*
           Resource: "*"
 
+package:
+  artifact: TaskApi/bin/Release/net8.0/TaskApi.zip
+
 functions:
   task-api:
     handler: TaskApi
