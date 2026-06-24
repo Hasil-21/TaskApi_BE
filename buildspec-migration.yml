@@ -1,12 +1,9 @@
 version: 0.2
+
 phases:
   install:
-    runtime-versions:
-      dotnet: 8
     commands:
-      - dotnet tool install --global dotnet-ef   
-      - export PATH="$PATH:/root/.dotnet/tools"  
-
+      - npm install -g serverless@3
   build:
     commands:
-      - dotnet ef database update --connection "$CONNECTION_STRING"  
+      - serverless deploy --stage dev --region ap-south-1
