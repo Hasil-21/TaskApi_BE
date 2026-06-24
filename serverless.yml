@@ -1,67 +1,50 @@
 service: demo-project
 
-provider: 
+provider:
   name: aws
   runtime: dotnet8
   region: ap-south-1
+  stage: dev
   versionFunctions: false
 
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - logs:*
-        - ec2:*
-        - ssm:*
-        - kms:Decrypt
-        - sqs:*
-        - sns:*
-      Resource: "*"
+  vpc:
+    subnetIds:
+      - '{{resolve:ssm:/demo-project/dev/private-subnet-1a}}'
+      - '{{resolve:ssm:/demo-project/dev/private-subnet-1b}}'
+    securityGroupIds:
+      - '{{resolve:ssm:/demo-project/dev/lambda-sg-id}}'
+
+  environment:
+    ASPNETCORE_ENVIRONMENT: Production
+    CONNECTION_STRING: '{{resolve:ssm:demo-project/dev/connection-string}}'
+    
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: 
+            - ec2:*
+            - ssm:*
+            - secretsmanager:*
+          Resource: "*"
 
 functions:
-  demo-project-lambda-sls:
-    handler: TaskApi 
-    memorySize: 512
-    timeout: 30
-    events: 
+  task-api:
+    handler: TaskApi
+    events:
       - http:
-          path: /{proxy+}
-          method: ANY
-          cors: true
-          authorizer:
-            name: cognito-authorizer
-            type: COGNITO_USER_POOLS
-            arn: ${cf:demo-project-cf.CognitoUserPoolArn}
+          path: /api/tasks
+          method: GET
       - http:
-          path: /
-          method: ANY
-          cors: true
-          authorizer:
-            name: cognito-authorizer
-            type: COGNITO_USER_POOLS
-            arn: ${cf:demo-project-cf.CognitoUserPoolArn}
-    vpc: 
-      securityGroupIds:
-        - ${cf:demo-project-cf.SlsLambdaSecurityGroup}
-      subnetIds:
-        - ${cf:demo-project-cf.SlsPrivateSubnet1}
-        - ${cf:demo-project-cf.SlsPrivateSubnet2}
-    environment:
-      CONNECTION_STRING: ${ssm:/aws/reference/secretsmanager/dummy-project/connection-string}
-      SQS_URL: ${cf:demo-project-cf.SQSUrl}  
-    destinations:
-      onSuccess: ${cf:demo-project-cf.SlsSQSQueueArn}
-
-  demo-project-process-sqs:
-    handler: TaskApi::SqsProcessor.Function::FunctionHandler
-    memorySize: 256
-    timeout: 30
-    environment:
-      SNS_TOPIC_ARN: ${cf:demo-project-cf.SnsTopicEmailArn}
-    events: 
-      - sqs:
-          arn: ${cf:demo-project-cf.SlsSQSQueueArn}
-          batchSize: 1
-          functionResponseType: ReportBatchItemFailures
-
-
-
+          path: /api/tasks/{id}
+          method: GET
+      - http:
+          path: /api/tasks
+          method: POST
+      - http:
+          path: /api/tasks/{id}
+          method: DELETE
+      - http:
+          path: /api/tasks/{id}
+          method: PUT
+    

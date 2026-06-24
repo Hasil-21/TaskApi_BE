@@ -1,0 +1,235 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This is the main pipeline template
+
+Resources:
+
+  #Role and Policy
+
+  TaskCodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: demo-project-be-codebuild-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: demo-project-be-codebuild-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:*
+                  - ssm:*
+                  - logs:*
+                  - s3:*
+                  - secretsmanager:*
+                  - lambda:*
+                  - iam:*
+                  - rds:*
+                  - cloudformation:*
+                  - apigateway:*
+                Resource: '*'
+
+  TaskCodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: demo-project-be-pipeline-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect:
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        PolicyName: demo-project-be-pipeline-policy
+        PolicyDocument:
+          Version:
+          Statement:
+            - Effect: Allow
+              Action:
+                - codebuild:*
+                - s3:*
+                - codestar-connections:*
+              Resource: '*'
+
+
+  #S3
+
+  TaskBEArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: hasil-be-pipeline-artifact
+      VersioningConfiguration:
+        Status: Enabled
+      
+
+  #CodeStar Connection
+  
+  TaskBEGithubConnection:
+    Type: AWS::CodeStarConnections:Connection
+    Properties:
+      ConnectionName: demo-project-be-connection
+      ProviderType: GitHub
+
+  #CodeBuild
+
+  TaskBuildCodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: demo-project-be-build
+      Source:
+        Type: CODEPIPELINE  
+        BuildSpec: buildspec-build.yml
+      ServiceRole: !GetAtt TaskCodeBuildRole.Arn
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+      Artifacts:
+        Type: CODEPIPELINE
+
+  TaskMigrationsCodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: demo-project-be-migration
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: buildspec-migration.yml
+      ServiceRole: !GetAtt TaskCodeBuildRole.Arn
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        EnvironmentVariables:
+          - Name: CONNECTION_STRING
+            Value:  '{{resolve:ssm:/demo-project/dev/connection-string}}'
+            Type: PARAMETER_STORE
+      VpcConfig:
+        VpcId: '{{resolve:ssm:/demo-project/dev/vpc-id}}'
+        Subnets:
+          - '{{resolve:ssm:/demo-project/dev/private-subnet-1a}}'
+          - '{{resolve:ssm:/demo-project/dev/private-subnet-1b}}'
+        securityGroupIds: 
+          - '{{resolve:ssm:/demo-project/dev/lambda-sg-id}}'
+      Artifacts:
+        Type: CODEPIPELINE
+
+  TaskDeployCodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: demo-project-be-deploy
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: buildspec-deploy.yml
+      ServiceRole: !GetAtt TaskCodeBuildRole.Arn
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+      Artifacts:
+        Type: CODEPIPELINE
+
+
+  #Code Pipeline
+
+  TaskCodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: demo-project-be-pipeline 
+      RoleArn: !GetAtt TaskCodePipelineRole.Arn
+      PipelineType: V2
+      ArtifactStore:
+        Type: S3
+        Location: !Ref TaskBEArtifactBucket
+      Triggers:
+        - ProviderType: CodeStarSourceConnection
+          GitConfiguration:
+            SourceActionName: Source
+            Push:
+              - Branches:
+                  Includes:
+                    - main
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: '1'
+              Configuration:
+                ConnectionArn: !Ref TaskBEGithubConnection
+                FullRepositoryId: Hasil-21/TaskApi_BE
+                BranchName: main
+                DetectChanges: false
+              OutputArtifacts:
+                - Name: SourceOutput
+
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref TaskBuildCodeBuild
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOutput
+
+        - Name: Migrate
+          Actions:
+            - Name: Migrate
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref TaskMigrationsCodeBuild
+              InputArtifacts:
+                - Name: BuildOutput
+
+        - Name: Approve
+          Actions:
+            - Name: ManualApproval
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Provider: Manual
+                Version: '1'
+              Configuration:
+                CustomData: 'Migration complete. Review and approve to deploy to Lambda.'
+
+        - Name: Deploy
+          Actions:
+            - Name: Deploy
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref TaskDeployCodeBuild
+              InputArtifacts:
+                - Name: BuildOutput
+
+Outputs:
+  PipelineName:
+    Value: !Ref TaskCodePipeline
+  GithubConnectionArn:
+    Value: !Ref TaskBEGithubConnection

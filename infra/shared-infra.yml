@@ -1,0 +1,208 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This is a shared infra file which contains common resources
+
+Resources:
+
+  #VPC
+
+  TaskVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+
+  #Subnet
+
+  PublicTaskSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref TaskVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: ap-south-1a
+
+  PublicTaskSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref TaskVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: ap-south-1b
+
+  PrivateTaskSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref TaskVPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: ap-south-1a
+
+  PrivateTaskSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref TaskVPC
+      CidrBlock: 10.0.4.0/24
+      AvailabilityZone: ap-south-1b
+
+
+  #IGW
+
+  TaskIGW:
+    Type: AWS::EC2::InternetGateway
+
+  TaskVPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref TaskIGW
+      VpcId: !Ref TaskVPC
+
+
+  #NAT
+
+  TaskEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      domain: vpc
+
+  TaskNAT:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt TaskEIP.AllocationId
+      SubnetId: !Ref PublicTaskSubnet1
+
+
+  #Routing
+
+  PublicTaskRoutingTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref TaskVPC
+
+  PrivateTaskRoutingTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref TaskVPC
+
+  PublicTaskRoute:
+    Type: AWS::EC2::Route
+    DependsOn: TaskVPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicTaskRoutingTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref TaskIGW
+
+  PrivateTaskRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateTaskRoutingTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref TaskNAT
+
+  PublicTaskSubnet1RouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicTaskSubnet1
+      RouteTableId: !Ref PublicTaskRoutingTable
+
+  PublicTaskSubnet2RouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicTaskSubnet2
+      RouteTableId: !Ref PublicTaskRoutingTable
+
+  PrivateTaskSubnet1RouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateTaskSubnet1
+      RouteTableId: !Ref PrivateTaskRoutingTable
+
+  PrivateTaskSubnet2RouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateTaskSubnet2
+      RouteTableId: !Ref PrivateTaskRoutingTable
+
+
+  #SG
+
+  TaskLambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: This is a Lambda Security Group
+      VpcId: !Ref TaskVPC
+
+  TaskRDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: This is a RDS Security Group
+      VpcId: !Ref TaskVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref TaskLambdaSecurityGroup
+
+
+  #SSM Parameters
+
+  PublicTaskSubnet1SSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /demo-project/dev/public-subnet-1a
+      Type: String
+      Value: !Ref PublicTaskSubnet1
+
+  PublicTaskSubnet2SSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /demo-project/dev/public-subnet-1b
+      Type: String
+      Value: !Ref PublicTaskSubnet2
+
+  PrivateTaskSubnet1SSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /demo-project/dev/private-subnet-1a
+      Type: String
+      Value: !Ref PrivateTaskSubnet1
+
+  PrivateTaskSubnet2SSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /demo-project/dev/private-subnet-1b
+      Type: String
+      Value: !Ref PrivateTaskSubnet2
+
+  TaskRDSSecurityGroupSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /demo-project/dev/rds-sg-id
+      Type: String
+      Value: !Ref TaskRDSSecurityGroup
+
+  TaskLambdaSecurityGroupSSM:
+    Type: AWS::SSM::Parameter
+    Properties: 
+      Name: /demo-project/dev/lambda-sg-id
+      Type: String
+      Value: !Ref TaskLambdaSecurityGroup
+
+  TaskVPCSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /demo-project/dev/vpc-id
+      Type: String
+      Value: !Ref TaskVPC
+
+
+Outputs:
+  VPCId:
+    Value: !Ref TaskVPC
+  PublicSubnet1Id:
+    Value: !Ref PublicTaskSubnet1
+  PublicSubnet2Id:
+    Value: !Ref PublicTaskSubnet2
+  PrivateSubnet1Id:
+    Value: !Ref PrivateTaskSubnet1
+  PrivateSubnet2Id:
+    Value: !Ref PrivateTaskSubnet2
+  LambdaSGId:
+    Value: !Ref TaskLambdaSecurityGroup
+  RDSSGId:
+    Value: !Ref TaskRDSSecurityGroup

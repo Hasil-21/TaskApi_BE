@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Amazon.SQS;
 using Amazon.SQS.Model;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskApi.Data;
@@ -13,11 +14,14 @@ namespace TaskApi.Controllers;
 public class TasksController : ControllerBase
 {
     private readonly AppDbContext _db;
-    private readonly IAmazonSQS _sqs;
-    public TasksController(AppDbContext db,IAmazonSQS sqs)
+    public TasksController(AppDbContext db)
     {
         _db=db;
-        _sqs=sqs;
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        return Ok(await _db.Tasks.ToListAsync());
     }
 
     [HttpGet("{id}")]
@@ -32,11 +36,6 @@ public class TasksController : ControllerBase
     {
         _db.Tasks.Add(task);
         await _db.SaveChangesAsync();
-        await _sqs.SendMessageAsync(new SendMessageRequest
-        {
-            QueueUrl=Environment.GetEnvironmentVariable("SQS_URL"),
-            MessageBody = JsonSerializer.Serialize(task)
-        });
         return CreatedAtAction(nameof(GetById), new { id = task.Id }, task);
     }
 
