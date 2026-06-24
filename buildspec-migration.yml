@@ -9,5 +9,4 @@ phases:
 
   build:
     commands:
-      - cd TaskApi
       - dotnet ef database update --connection "$CONNECTION_STRING"  
