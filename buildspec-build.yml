@@ -1,0 +1,17 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      dotnet: 8
+  build:
+    commands:
+      - cd TaskApi
+      - dotnet restore
+      - dotnet lambda package --configuration Release --output-package bin/Release/net8.0/TaskApi.zip
+artifacts:
+  files:
+    - TaskApi/bin/Release/net8.0/TaskApi.zip
+    - serverless.yml
+    - buildspec-migrate.yml
+    - buildspec-deploy.yml
+  discard-paths: no

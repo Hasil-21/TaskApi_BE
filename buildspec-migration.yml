@@ -1,0 +1,13 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      dotnet: 8
+    commands:
+      - dotnet tool install --global dotnet-ef   
+      - export PATH="$PATH:/root/.dotnet/tools"  
+
+  build:
+    commands:
+      - cd TaskApi
+      - dotnet ef database update --connection "$CONNECTION_STRING"  

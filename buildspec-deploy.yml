@@ -1,0 +1,10 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20              
+    commands:
+      - npm install -g serverless@3   
+  build:
+    commands:
+      - serverless deploy --stage dev --region ap-south-1

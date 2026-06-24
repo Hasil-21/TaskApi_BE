@@ -2,27 +2,17 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: This is a cloudformation template for RDS database
 
 Resources: 
-  TaskRDSSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: demo-project/dev/rds-credentials
-      GenerateSecretString:
-        SecretStringTemplate: '{"username": "task_admin"}'
-        GenerateStringKey: password
-        PasswordLength: 16
-        ExcludeCharacters: '"@/\'
 
   TaskRDSSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: This is a RDS subnet group for Private subnets
       SubnetIds:
-        - !Sub '{{resolve:ssm:/demo-project/dev/private-subnet-1a}}'
-        - !Sub '{{resolve:ssm:/demo-project/dev/private-subnet-1b}}'
+        - '{{resolve:ssm:/demo-project/dev/private-subnet-1a}}'
+        - '{{resolve:ssm:/demo-project/dev/private-subnet-1b}}'
 
   TaskDatabase:
     Type: AWS::RDS::DBInstance
-    DependsOn: TaskRDSSecret
     Properties: 
       DBName: taskdb
       DBInstanceIdentifier: task-rds-db
@@ -32,9 +22,9 @@ Resources:
       AllocatedStorage: "20"
       StorageType: gp3
       MasterUsername: task_admin
-      MasterUserPassword: !Sub '{{resolve:secretsmanager:demo-project/dev/rds-password:SecretString:password}}'
+      MasterUserPassword: Admin#1234
       PubliclyAccessible: false
-      VPCSecurityGroup:
+      VPCSecurityGroups:
         - '{{resolve:ssm:/demo-project/dev/rds-sg-id}}'
       DBSubnetGroupName: !Ref TaskRDSSubnetGroup
       MultiAZ: false
@@ -44,10 +34,10 @@ Resources:
   TaskConnectionStringSSM:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: demo-project/dev/connection-string
+      Name: /demo-project/dev/connection-string
       Type: String
       Value: !Sub 
-        - 'Host=${Endpoint};Port=5432;Database=taskdb;Username=task_admin;Password=${{resolve:secretsmanager:demo-project/dev/rds-password:SecretString:password}}'
+        - 'Host=${Endpoint};Port=5432;Database=taskdb;Username=task_admin;Password=Admin#1234'
         - Endpoint: !GetAtt TaskDatabase.Endpoint.Address
 
 Outputs:
