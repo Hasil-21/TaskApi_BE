@@ -202,7 +202,7 @@ Resources:
               Configuration:
                 ProjectName: !Ref TaskMigrationsCodeBuild
               InputArtifacts:
-                - Name: BuildOutput
+                - Name: SourceOutput
 
         - Name: Approve
           Actions:

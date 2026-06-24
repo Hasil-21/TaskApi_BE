@@ -7,4 +7,5 @@ phases:
       - export PATH="$PATH:/root/.dotnet/tools"
   build:
     commands:
+      - dotnet restore
       - dotnet ef database update --connection "$CONNECTION_STRING" --project TaskApi.csproj
