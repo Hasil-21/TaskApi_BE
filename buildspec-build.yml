@@ -5,8 +5,7 @@ phases:
       dotnet: 8
   build:
     commands:
-      - cd TaskApi
-      - dotnet restore
+      - dotnet restore TaskApi.csproj
       - dotnet lambda package --configuration Release --output-package bin/Release/net8.0/TaskApi.zip
 artifacts:
   files:
