@@ -29,7 +29,7 @@ provider:
           Resource: "*"
 
 package:
-  artifact: TaskApi/bin/Release/net8.0/TaskApi.zip
+  artifact: TaskApi
 
 functions:
   task-api:
