@@ -94,7 +94,7 @@ Resources:
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:7.0
+        Image: aws/codebuild/amazonlinux-x86_64-standard:6.0
       Artifacts:
         Type: CODEPIPELINE
 
@@ -109,7 +109,7 @@ Resources:
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:7.0
+        Image: aws/codebuild/amazonlinux-x86_64-standard:6.0
         EnvironmentVariables:
           - Name: CONNECTION_STRING
             Value: /demo-project/dev/connection-string
@@ -135,7 +135,7 @@ Resources:
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:7.0
+        Image: aws/codebuild/amazonlinux-x86_64-standard:6.0
       Artifacts:
         Type: CODEPIPELINE
 
