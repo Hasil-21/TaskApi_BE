@@ -50,4 +50,23 @@ functions:
       - http:
           path: /api/tasks/{id}
           method: PUT
+  product-api:
+    handler: TaskApi
+    events:
+      - http:
+          path: /api/products
+          method: GET
+      - http:
+          path: /api/products/{id}
+          method: GET
+      - http:
+          path: /api/products
+          method: POST
+      - http:
+          path: /api/products/{id}
+          method: PUT
+      - http:
+          path: /api/products/{id}
+          method: DELETE
+
     
