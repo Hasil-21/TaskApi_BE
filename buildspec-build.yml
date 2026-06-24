@@ -18,4 +18,4 @@ artifacts:
     - serverless.yml
     - buildspec-deploy.yml
     - buildspec-migration.yml
-  discard-paths: no
+  discard-paths: yes
