@@ -7,7 +7,6 @@ phases:
       - export PATH="$PATH:/root/.dotnet/tools"
   build:
     commands:
-      - cd TaskApi
       - dotnet restore
       - dotnet lambda package --configuration Release --output-package bin/Release/net8.0/TaskApi.zip
 
