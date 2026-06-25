@@ -138,6 +138,17 @@ Resources:
           ToPort: 5432
           SourceSecurityGroupId: !Ref TaskLambdaSecurityGroup
 
+  #S3 Bucket for presigned URL
+
+  TaskS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: hasil-test-s3-bucket-presigned
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
   #SSM Parameters
 
@@ -189,6 +200,13 @@ Resources:
       Name: /demo-project/dev/vpc-id
       Type: String
       Value: !Ref TaskVPC
+
+  TaskS3SSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /demo-project/dev/s3-bucket-presigned
+      Type: String
+      Value: !Ref TaskS3Bucket
 
 
 Outputs:

@@ -17,6 +17,7 @@ provider:
   environment:
     ASPNETCORE_ENVIRONMENT: Production
     CONNECTION_STRING: '{{resolve:ssm:/demo-project/dev/connection-string}}'
+    BUCKET_NAME: '{{resolve:ssm:/demo-project/dev/s3-bucket-presigned}}'
     
   iam:
     role:
@@ -26,6 +27,7 @@ provider:
             - ec2:*
             - ssm:*
             - secretsmanager:*
+            - s3:GetObject
           Resource: "*"
 
 package:
@@ -50,6 +52,9 @@ functions:
       - http:
           path: /api/tasks/{id}
           method: PUT
+      - http:
+          path: /api/assets/{filename}
+          method: GET
   product-api:
     handler: TaskApi
     events:

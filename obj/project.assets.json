@@ -148,7 +148,7 @@
           }
         }
       },
-      "AWSSDK.Core/4.0.9.6": {
+      "AWSSDK.Core/4.0.9.7": {
         "type": "package",
         "compile": {
           "lib/net8.0/AWSSDK.Core.dll": {
@@ -181,6 +181,22 @@
         },
         "build": {
           "buildTransitive/net8.0/AWSSDK.Extensions.NETCore.Setup.targets": {}
+        }
+      },
+      "AWSSDK.S3/4.0.25.3": {
+        "type": "package",
+        "dependencies": {
+          "AWSSDK.Core": "[4.0.9.7, 5.0.0)"
+        },
+        "compile": {
+          "lib/net8.0/AWSSDK.S3.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/AWSSDK.S3.dll": {
+            "related": ".xml"
+          }
         }
       },
       "AWSSDK.SimpleNotificationService/4.0.3.7": {
@@ -1344,15 +1360,15 @@
         "lib/net8.0/Amazon.Lambda.SQSEvents.xml"
       ]
     },
-    "AWSSDK.Core/4.0.9.6": {
-      "sha512": "Lzi5hMHNB+ApeMbQxNDCUNa+Lta00ozr1okKUGqUyNXUC/OG136k8M6jXgNrbwsRxDmVdHHY6UdD4aoUaGVzkQ==",
+    "AWSSDK.Core/4.0.9.7": {
+      "sha512": "zCk+WKedXq45u92RcqWcZodzwvQryrqNpUWFdEPBm3ExuwDhY3BMF0VYMWiD/ko0ThhChqf9libgIpd/hQuBPQ==",
       "type": "package",
-      "path": "awssdk.core/4.0.9.6",
+      "path": "awssdk.core/4.0.9.7",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "awssdk.core.4.0.9.6.nupkg.sha512",
+        "awssdk.core.4.0.9.7.nupkg.sha512",
         "awssdk.core.nuspec",
         "images/AWSLogo.png",
         "lib/net472/AWSSDK.Core.dll",
@@ -1386,6 +1402,31 @@
         "lib/netcoreapp3.1/AWSSDK.Extensions.NETCore.Setup.xml",
         "lib/netstandard2.0/AWSSDK.Extensions.NETCore.Setup.dll",
         "lib/netstandard2.0/AWSSDK.Extensions.NETCore.Setup.xml"
+      ]
+    },
+    "AWSSDK.S3/4.0.25.3": {
+      "sha512": "xfvFNskg5x/Z10UkRA2XdQxADgMoBPE4LwrGDvE7EGoK7nqoO1CCmLNy1jteprZDBEHwUAZcIfagEDN7YFhH0Q==",
+      "type": "package",
+      "path": "awssdk.s3/4.0.25.3",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "analyzers/dotnet/cs/AWSSDK.S3.CodeAnalysis.dll",
+        "analyzers/dotnet/cs/SharedAnalysisCode.dll",
+        "awssdk.s3.4.0.25.3.nupkg.sha512",
+        "awssdk.s3.nuspec",
+        "images/AWSLogo.png",
+        "lib/net472/AWSSDK.S3.dll",
+        "lib/net472/AWSSDK.S3.xml",
+        "lib/net8.0/AWSSDK.S3.dll",
+        "lib/net8.0/AWSSDK.S3.xml",
+        "lib/netcoreapp3.1/AWSSDK.S3.dll",
+        "lib/netcoreapp3.1/AWSSDK.S3.xml",
+        "lib/netstandard2.0/AWSSDK.S3.dll",
+        "lib/netstandard2.0/AWSSDK.S3.xml",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
       ]
     },
     "AWSSDK.SimpleNotificationService/4.0.3.7": {
@@ -3183,6 +3224,7 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "AWSSDK.Extensions.NETCore.Setup >= 4.0.4.9",
+      "AWSSDK.S3 >= 4.0.25.3",
       "AWSSDK.SQS >= 4.0.3.6",
       "AWSSDK.SimpleNotificationService >= 4.0.3.7",
       "Amazon.Lambda.AspNetCoreServer >= 10.1.1",
@@ -3240,6 +3282,10 @@
           "AWSSDK.Extensions.NETCore.Setup": {
             "target": "Package",
             "version": "[4.0.4.9, )"
+          },
+          "AWSSDK.S3": {
+            "target": "Package",
+            "version": "[4.0.25.3, )"
           },
           "AWSSDK.SQS": {
             "target": "Package",

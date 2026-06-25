@@ -1,3 +1,4 @@
+using Amazon.S3;
 using Amazon.SQS;
 using Microsoft.EntityFrameworkCore;
 using TaskApi.Data;
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAWSLambdaHosting(LambdaEventSource.RestApi);
 builder.Services.AddControllers();
 builder.Services.AddAWSService<IAmazonSQS>();
+builder.Services.AddAWSService<IAmazonS3>();
 
 var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING")
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
