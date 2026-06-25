@@ -114,6 +114,9 @@ Resources:
           - Name: CONNECTION_STRING
             Value: /demo-project/dev/connection-string
             Type: PARAMETER_STORE
+          - Name: RUN_MIGRATION
+            Value: /demo-project/dev/run-migration
+            Type: PARAMETER_STORE
       VpcConfig:
         VpcId: '{{resolve:ssm:/demo-project/dev/vpc-id}}'
         Subnets:

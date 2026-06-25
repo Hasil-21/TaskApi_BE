@@ -39,6 +39,13 @@ Resources:
       Value: !Sub 
         - 'Host=${Endpoint};Port=5432;Database=taskdb;Username=task_admin;Password=Admin#1234'
         - Endpoint: !GetAtt TaskDatabase.Endpoint.Address
+    
+  TaskRunMigrationSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /demo-project/dev/run-migration
+      Type: String
+      Value: "false"
 
 Outputs:
   RDSEndpoint:
