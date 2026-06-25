@@ -14,8 +14,8 @@ public class AssetsController : ControllerBase
     public AssetsController(IAmazonS3 s3)
     {
         _s3 = s3;
-        _bucketName = Environment.GetEnvironmentVariable("ASSETS_BUCKET")
-            ?? throw new Exception("ASSETS_BUCKET env var not set");
+        _bucketName = Environment.GetEnvironmentVariable("BUCKET_NAME")
+            ?? throw new Exception("BUCKET_NAME env var not set");
     }
 
     [HttpGet("{filename}")]

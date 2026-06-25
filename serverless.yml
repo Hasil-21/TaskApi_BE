@@ -55,9 +55,6 @@ functions:
       - http:
           path: /api/assets/{filename}
           method: GET
-  product-api:
-    handler: TaskApi
-    events:
       - http:
           path: /api/products
           method: GET
