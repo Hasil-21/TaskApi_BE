@@ -18,7 +18,6 @@ provider:
     ASPNETCORE_ENVIRONMENT: Production
     CONNECTION_STRING: '{{resolve:ssm:/demo-project/dev/connection-string}}'
     BUCKET_NAME: '{{resolve:ssm:/demo-project/dev/s3-bucket-presigned}}'
-    SES_SENDER_EMAIL: hasiltr@gmail.com
     
   iam:
     role:
@@ -29,7 +28,6 @@ provider:
             - ssm:*
             - secretsmanager:*
             - s3:GetObject
-            - ses:*
           Resource: "*"
 
 package:
