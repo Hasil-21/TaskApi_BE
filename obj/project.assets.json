@@ -199,6 +199,22 @@
           }
         }
       },
+      "AWSSDK.SimpleEmail/4.0.3.8": {
+        "type": "package",
+        "dependencies": {
+          "AWSSDK.Core": "[4.0.9.7, 5.0.0)"
+        },
+        "compile": {
+          "lib/net8.0/AWSSDK.SimpleEmail.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/AWSSDK.SimpleEmail.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "AWSSDK.SimpleNotificationService/4.0.3.7": {
         "type": "package",
         "dependencies": {
@@ -1425,6 +1441,31 @@
         "lib/netcoreapp3.1/AWSSDK.S3.xml",
         "lib/netstandard2.0/AWSSDK.S3.dll",
         "lib/netstandard2.0/AWSSDK.S3.xml",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
+      ]
+    },
+    "AWSSDK.SimpleEmail/4.0.3.8": {
+      "sha512": "dcndpd+XjitT+YdO8Cfkfb6EgkNJfzw7cmARfMKGHjkKt5AyLMOUQTNv+XyJC9e3AnWLAX4rDa5vMy9C/Da51Q==",
+      "type": "package",
+      "path": "awssdk.simpleemail/4.0.3.8",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "analyzers/dotnet/cs/AWSSDK.SimpleEmail.CodeAnalysis.dll",
+        "analyzers/dotnet/cs/SharedAnalysisCode.dll",
+        "awssdk.simpleemail.4.0.3.8.nupkg.sha512",
+        "awssdk.simpleemail.nuspec",
+        "images/AWSLogo.png",
+        "lib/net472/AWSSDK.SimpleEmail.dll",
+        "lib/net472/AWSSDK.SimpleEmail.xml",
+        "lib/net8.0/AWSSDK.SimpleEmail.dll",
+        "lib/net8.0/AWSSDK.SimpleEmail.xml",
+        "lib/netcoreapp3.1/AWSSDK.SimpleEmail.dll",
+        "lib/netcoreapp3.1/AWSSDK.SimpleEmail.xml",
+        "lib/netstandard2.0/AWSSDK.SimpleEmail.dll",
+        "lib/netstandard2.0/AWSSDK.SimpleEmail.xml",
         "tools/install.ps1",
         "tools/uninstall.ps1"
       ]
@@ -3226,6 +3267,7 @@
       "AWSSDK.Extensions.NETCore.Setup >= 4.0.4.9",
       "AWSSDK.S3 >= 4.0.25.3",
       "AWSSDK.SQS >= 4.0.3.6",
+      "AWSSDK.SimpleEmail >= 4.0.3.8",
       "AWSSDK.SimpleNotificationService >= 4.0.3.7",
       "Amazon.Lambda.AspNetCoreServer >= 10.1.1",
       "Amazon.Lambda.AspNetCoreServer.Hosting >= 2.0.0",
@@ -3290,6 +3332,10 @@
           "AWSSDK.SQS": {
             "target": "Package",
             "version": "[4.0.3.6, )"
+          },
+          "AWSSDK.SimpleEmail": {
+            "target": "Package",
+            "version": "[4.0.3.8, )"
           },
           "AWSSDK.SimpleNotificationService": {
             "target": "Package",
