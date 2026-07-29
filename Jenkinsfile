@@ -72,7 +72,7 @@ pipeline{
 					dir('ansible') {			
 						sh '''
 							export ANSIBLE_HOST_KEY_CHECKING=False
-							ansible-playbook -i inventory.ini site.yml --extra-vars "db_password=${DB_PASSWORD}"'	
+							ansible-playbook -i inventory.ini site.yml --extra-vars "db_password=${DB_PASSWORD}"	
 						'''				
 					}
 				}
