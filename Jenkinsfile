@@ -57,7 +57,7 @@ pipeline{
 		                echo "EC2 IP from Terraform output: ${ec2_ip}"
 
 		                writeFile file: '../ansible/inventory.ini',
-		                          text: "[taskapi_servers]\n${ec2_ip} ansible_user=ubuntu ansible_ssh_private_key_file=\$SSH_KEY\n"
+		                          text: "[taskapi_servers]\n${ec2_ip} ansible_user=ubuntu"
 		            }
 		        }
 		    }
@@ -72,7 +72,7 @@ pipeline{
 					dir('ansible') {			
 						sh '''
 							export ANSIBLE_HOST_KEY_CHECKING=False
-							ansible-playbook -i inventory.ini site.yml --extra-vars "db_password=${DB_PASSWORD}"	
+							ansible-playbook -i inventory.ini site.yml --private-key $SSH_KEY --extra-vars "db_password=${DB_PASSWORD}"	
 						'''				
 					}
 				}
