@@ -1,0 +1,16 @@
+[Unit]
+Description=TaskApi .NET Service
+After=network.target
+
+[Service]
+WorkingDirectory={{ app_dir }}
+ExecStart=/usr/bin/dotnet {{ app_dir }}/TaskApi.dll
+Restart=always
+RestartSec=10
+User=ubuntu
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://0.0.0.0:5000
+Environment=ConnectionStrings__DefaultConnection=Host={{ db_host }};Database={{ db_name }};Username={{ db_username }};Password={{ db_password }}
+
+[Install]
+WantedBy=multi-user.target

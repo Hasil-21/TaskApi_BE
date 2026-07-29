@@ -1,0 +1,43 @@
+---
+- name: Update cache
+  apt:
+    update_cache: yes
+
+- name: Install .NET 8 runtime and postgreSQL client
+  apt:
+    name:
+      -  aspnetcore-runtime-8.0
+      -  postgresql-client
+    state: present
+    update_cache: yes
+
+- name: Create app directory
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+
+- name: Copy Taskapi build artifact
+  copy:
+    src: ../artifacts/taskapi-build/
+    dest: "{{ app_dir }}"
+
+- name: Copy Taskapi ef bundle artifact
+  copy:
+    src: ../artifacts/efbundle
+    dest: "{{ app_dir }}/efbundle"
+    mode: '0755'
+
+- name: Run migrations via bundle
+  command: "{{ app_dir }}/efbundle --connection \"Host={{ db_host }};Database={{ db_name }};Username={{ db_username }};Password={{ db_password }}\""
+
+- name: Template systemd service file
+  template:
+    src: taskapi.service.j2
+    dest: /etc/systemd/system/taskapi.service
+
+- name: Reload systemd and restart taskapi
+  systemd:
+    daemon_reload: yes
+    name: taskapi
+    enabled: yes
+    state: restarted

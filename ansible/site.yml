@@ -1,0 +1,10 @@
+- hosts: taskapi_servers
+  become: true
+  roles:
+    -  taskapi
+
+- hosts: jenkins
+  become: true
+  gather_facts: true
+  roles:
+    -  jenkins-controller

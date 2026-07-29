@@ -1,0 +1,154 @@
+---
+- name: update jenkins cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: install required packages
+  apt:
+    name:
+      - wget
+      - unzip
+      - gnupg
+      - python3-pip
+      - software-properties-common
+      - fontconfig
+      - openjdk-21-jre
+    state: present
+
+
+# --- Jenkins ---
+
+- name: install jenkins controller key
+  get_url:
+    url: https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+    dest: /usr/share/keyrings/jenkins-keyring.asc
+    mode: '0644'
+
+- name: add jenkins apt repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+    state: present
+    filename: jenkins
+
+- name: update cache after adding jenkins repo
+  apt:
+    update_cache: yes
+
+- name: install jenkins
+  apt:
+    name: jenkins
+    state: present
+
+- name: check jenkins service is running
+  systemd:
+    name: jenkins
+    enabled: yes
+    state: started
+    daemon_reload: yes
+
+
+# --- .NET SDK ---
+
+- name: add microsoft package repository
+  shell: |
+    wget https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb -O /tmp/packages-microsoft-prod.deb
+    dpkg -i /tmp/packages-microsoft-prod.deb
+  args:
+    creates: /etc/apt/sources.list.d/microsoft-prod.list
+
+- name: Update apt cache after adding Microsoft repo
+  apt:
+    update_cache: yes
+
+- name: Install .NET 8 SDK
+  apt:
+    name:
+      - dotnet-sdk-8.0
+      - acl
+    state: present
+
+- name: Install dotnet-ef tool globally
+  become: yes
+  become_user: jenkins
+  shell: dotnet tool install --global dotnet-ef
+  args:
+    creates: /var/lib/jenkins/.dotnet/tools/dotnet-ef
+
+- name: Add dotnet tools to PATH via profile.d
+  copy:
+    dest: /etc/profile.d/dotnet-tools-path.sh
+    content: |
+      export PATH="$PATH:/var/lib/jenkins/.dotnet/tools"
+    mode: '0644'
+
+
+# --- Terraform ---
+- name: Remove any existing (possibly stale) HashiCorp keyring
+  file:
+    path: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+    state: absent
+
+- name: Add hashicorp GPG key
+  get_url:
+    url: https://apt.releases.hashicorp.com/gpg
+    dest: /tmp/hashicorp.gpg.asc
+    mode: '0644'
+    force: yes
+
+- name: Dearmor HashiCorp GPG key
+  shell: gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg /tmp/hashicorp.gpg.asc
+
+- name: Add hashicorp repository
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
+    state: present
+    filename: hashicorp
+
+- name: Update apt cache after adding HashiCorp repo
+  apt:
+    update_cache: yes
+
+- name: Install terraform
+  apt:
+    name: terraform
+    state: present
+
+
+# --- AWS CLI v2 ---
+
+- name: Check if AWS CLI is already installed
+  command: aws --version
+  register: aws_cli_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Download AWS CLI v2 installer
+  get_url:
+    url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: /tmp/awscliv2.zip
+  when: aws_cli_check.rc != 0
+
+- name: Unzip AWS CLI installer
+  unarchive:
+    src: /tmp/awscliv2.zip
+    dest: /tmp
+    remote_src: yes
+  when: aws_cli_check.rc != 0
+
+- name: Install AWS CLI
+  command: /tmp/aws/install
+  when: aws_cli_check.rc != 0
+
+
+# --- Ansible ---
+
+- name: Install ansible
+  apt:
+    name: ansible
+    state: present
+
+- name: Install postgreSQL client
+  apt:
+    name: postgresql-client
+    state: present

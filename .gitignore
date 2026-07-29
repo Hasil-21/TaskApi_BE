@@ -1,0 +1,25 @@
+# .NET build output
+TaskApi/bin/
+TaskApi/obj/
+**/bin/
+**/obj/
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/*.tfplan
+terraform/tfplan
+terraform/crash.log
+terraform/*.tfvars
+
+# Ansible
+ansible/inventory.ini       
+ansible/artifacts/         
+
+# General
+*.pem
+*.key
+.env
+.DS_Store

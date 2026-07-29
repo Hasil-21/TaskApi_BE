@@ -1,0 +1,6 @@
+dotnet_version: "8.0"
+app_dir: /opt/taskapi
+db_host: "taskapi-db.cbym6qeguqg4.ap-south-1.rds.amazonaws.com"
+db_name: taskapidb
+db_username: taskapiadmin
+db_password: SuperSecretDBPass1234
