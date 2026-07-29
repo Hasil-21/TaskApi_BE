@@ -48,6 +48,20 @@ pipeline{
 				}
 			}
 		}
+
+		stage('Generate Ansible Inventory') {
+		    steps {
+		        dir('terraform') {
+		            script {
+		                def ec2_ip = sh(script: 'terraform output -raw ec2_public_ip', returnStdout: true).trim()
+		                echo "EC2 IP from Terraform output: ${ec2_ip}"
+
+		                writeFile file: '../ansible/inventory.ini',
+		                          text: "[taskapi_servers]\n${ec2_ip} ansible_user=ubuntu ansible_ssh_private_key_file=\$SSH_KEY\n"
+		            }
+		        }
+		    }
+		}
 			
 		stage('Deploy via Ansible') {
 			steps {
@@ -56,7 +70,7 @@ pipeline{
 				    string(credentialsId: 'taskapi-db-password', variable: 'DB_PASSWORD')		
 				]) {
 					dir('ansible') {			
-						sh 'ansible-playbook -i inventory.ini site.yml --extra-vars "db_password=${DB_PASSWORD}"'	
+						sh 'ansible-playbook -i inventory.ini site.yml --limit taskapi_servers --extra-vars "db_password=${DB_PASSWORD}"'	
 					}
 				}
 			}
