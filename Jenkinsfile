@@ -70,7 +70,10 @@ pipeline{
 				    string(credentialsId: 'taskapi-db-password', variable: 'DB_PASSWORD')		
 				]) {
 					dir('ansible') {			
-						sh 'ansible-playbook -i inventory.ini site.yml --limit taskapi_servers --extra-vars "db_password=${DB_PASSWORD}"'	
+						sh '''
+							export ANSIBLE_HOST_KEY_CHECKING=False
+							ansible-playbook -i inventory.ini site.yml --extra-vars "db_password=${DB_PASSWORD}"'	
+						'''				
 					}
 				}
 			}
