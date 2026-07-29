@@ -141,6 +141,11 @@ resource "aws_instance" "ec2-jenkins-controller" {
     vpc_security_group_ids = [aws_security_group.jenkins-sg.id]
     key_name = "DemoKeyPair"
     associate_public_ip_address = true
+	 
+    root_block_device {
+	volume_size = 20
+	volume_type = "gp3"
+    }   
 
     tags = {
 	Name = "Jenkins-Controller"
