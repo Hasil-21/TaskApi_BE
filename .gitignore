@@ -10,6 +10,7 @@ terraform/.terraform.lock.hcl
 terraform/*.tfstate
 terraform/*.tfstate.backup
 terraform/*.tfplan
+terraform/inventory.tf
 terraform/tfplan
 terraform/crash.log
 terraform/*.tfvars

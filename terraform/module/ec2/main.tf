@@ -16,7 +16,7 @@ resource "aws_security_group" "ec2_sg"{
         to_port = 5000
         from_port = 5000
         protocol = "tcp"
-        cidr_blocks = [var.my_ip]
+        cidr_blocks = ["0.0.0.0/0"]
     }
 
     egress {
